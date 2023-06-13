@@ -8,6 +8,8 @@
 #include <stdio.h>
 #define SWAP(x,y,t) ((t)=(x),(x)=(y),(y)=(t))
 
+#define arraySize 100
+
 void printArray(int arr[], int n, char* str)
 {
 	int i;
@@ -109,31 +111,74 @@ void shell_sort(int list[], int n)
 	}
 }
 
+// 힙정렬을 위한 힙 구현
+typedef int HNode;
+#define Key(n) (n)
+
+HNode heap[arraySize + 10];
+int heap_size;
+
+#define Parent(i) (heap[i/2])
+#define Left(i) (heap[i*2])
+#define Right(i) (heap[i*2+1])
+
+void init_heap() { heap_size = 0; }
+int is_empty_heap() { return heap_size == 0; }
+int is_full_heap() { return (heap_size == arraySize + 10 - 1); }
+HNode fine_heap() { return heap[1]; }
+
+void insert_heap(HNode n)
+{
+	int i;
+	if (is_full_heap()) return;
+	i = ++(heap_size);
+	while (i != 1 && Key(n) > Key(Parent(i)))
+	{
+		heap[i] = Parent(i);
+		i /= 2;
+	}
+	heap[i] = n;
+}
+
+HNode delete_heap()
+{
+	HNode hroot, last;
+	int parent = 1, child = 2;
+	hroot = heap[1];
+	last = heap[heap_size--];
+	while (child <= heap_size)
+	{
+		if (child < heap_size && Key(Left(parent)) < Key(Right(parent)))
+			child++;
+		if (Key(last) >= Key(heap[child])) break;
+		heap[parent] = heap[child];
+		parent = child;
+		child *= 2;
+	}
+	heap[parent] = last;
+	return hroot;
+}
+
+//힙정렬
+void heapsort(int list[], int n)
+{
+	init_heap();
+	for (int i = 0; i < n; i++)
+	{
+		insert_heap(list[i]);
+	}
+	for (int i = n; i >= 0; i--)
+	{
+		list[i] = Key(delete_heap());
+	}
+}
+
 int main()
 {
 	int list[9] = { 5,3,8,4,9,1,6,2,7 };
-	int list1[9];
-	int list2[9];
-	int list3[9];
-	int list4[9];
-	int list5[9];
+	heapsort(list, 8);
 	for (int i = 0; i < 9; i++)
 	{
-		list1[i] = list[i];
-		list2[i] = list[i];
-		list3[i] = list[i];
-		list4[i] = list[i];
-		list5[i] = list[i];
+		printf("%d ", list[i]);
 	}
-	printArray(list1, 9, "Original ");
-	selection_sort(list1, 9);
-	printArray(list1, 9, "Selection");
-	selection_sort(list2, 9);
-	printArray(list2, 9, "Insertion");
-	selection_sort(list3, 9);
-	printArray(list3, 9, "Bubble");
-	insertion_sort_fn(list4, 9, descend);
-	printArray(list4, 9, "Descend");
-	shell_sort(list5, 9);
-	printArray(list5, 9, "Shell");
 }
