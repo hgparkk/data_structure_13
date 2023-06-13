@@ -152,6 +152,68 @@ int compare(const void* arg1, const void* arg2)
 	else return 0;
 }
 
+// 힙정렬을 위한 힙 구현
+typedef int HNode;
+#define Key(n) (n)
+
+HNode heap[arraySize+10];
+int heap_size;
+
+#define Parent(i) (heap[i/2])
+#define Left(i) (heap[i*2])
+#define Right(i) (heap[i*2+1])
+
+void init_heap() { heap_size = 0; }
+int is_empty_heap() { return heap_size == 0; }
+int is_full_heap() { return (heap_size == arraySize+10 - 1); }
+HNode fine_heap() { return heap[1]; }
+
+void insert_heap(HNode n)
+{
+	int i;
+	if (is_full_heap()) return;
+	i = ++(heap_size);
+	while (i != 1 && Key(n) > Key(Parent(i)))
+	{
+		heap[i] = Parent(i);
+		i /= 2;
+	}
+	heap[i] = n;
+}
+
+HNode delete_heap()
+{
+	HNode hroot, last;
+	int parent = 1, child = 2;
+	hroot = heap[1];
+	last = heap[heap_size--];
+	while (child <= heap_size)
+	{
+		if (child < heap_size && Key(Left(parent)) < Key(Right(parent)))
+			child++;
+		if (Key(last) >= Key(heap[child])) break;
+		heap[parent] = heap[child];
+		parent = child;
+		child *= 2;
+	}
+	heap[parent] = last;
+	return hroot;
+}
+
+//힙정렬
+void heapsort(int list[], int n)
+{
+	init_heap();
+	for (int i = 0; i < n; i++)
+	{
+		insert_heap(list[i]);
+	}
+	for (int i = n; i >= 0; i--)
+	{
+		list[i] = Key(delete_heap());
+	}
+}
+
 int main()
 {
 	//랜덤한 정수로 된 배열 생성과 복사
@@ -296,4 +358,17 @@ int main()
 	}
 	arvTime = total / 10;
 	printf("라이브러리 퀵 정렬 평균 수행 시간 : % lf\n", arvTime);
+
+	//힙 정렬을 이용한 정렬 시간 측정
+	total = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		start = (double)clock() / CLOCKS_PER_SEC;
+		heapsort(list1, arraySize);
+		finish = (double)clock() / CLOCKS_PER_SEC;
+		Time[i] = finish - start;
+		total += Time[i];
+	}
+	arvTime = total / 10;
+	printf("힙 정렬 평균 수행 시간 : % lf\n", arvTime);
 }
