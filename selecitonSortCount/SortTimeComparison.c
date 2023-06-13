@@ -1,6 +1,6 @@
 ﻿/*
 프로그램 내용 : 랜덤 배열 정렬 프로그램 시간 측정
-실습일 : 2023.06.01
+실습일 : 2023.06.08
 실습자 : 박현규
 학번 : 202111678
 */
@@ -116,18 +116,18 @@ int partition(int list[], int left, int right)
 {
 	int pivot, tmp;
 	int low, high;
-	low = right + 1;
-	high = right + 1;
+	low = left + 1;
+	high = right;
 	pivot = list[left];
-	do {
-		do
+	while (low <= high)
+	{
+		while (low <= right && list[low] <= pivot)
 			low++;
-		while (low <= right && list[low] < pivot);
-		do
+		while (high >= left && list[high] > pivot)
 			high--;
-		while (high >= left && list[high] > pivot);
-		if (low < high) SWAP(list[low], list[high], tmp);
-	} while (low < high);
+		if (low < high)
+			SWAP(list[low], list[high], tmp);
+	}
 	SWAP(list[left], list[high], tmp);
 	return high;
 }
